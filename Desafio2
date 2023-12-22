@@ -1,0 +1,103 @@
+class ContaBancaria:
+    def __init__(self):
+        self.limite_valor_saque = 500.0
+        self.limite_quantidade_saque = 3
+        self.saldo = 0.0
+        self.extrato = []
+        self.saques = 0
+
+    def __str__(self):
+        return f"{self.extrato}\nSaldo: R$ {self.saldo:.2f}"
+
+    def depositar(self):
+        valor = input("digite o valor para deposito -> ")
+        if str(valor).isdecimal:
+            aux = float(valor)
+            if aux > 0:
+                self.saldo += aux
+                self.extrato += f"R$ {aux:.2f} D\n"
+            else:
+                print("valor invalido para deposito")
+        else:
+            print("digite valor adequado para deposito: ")
+
+    def sacar(self):
+        valor = input("digite o valor para saque -> ")
+        if str(valor).isdecimal:
+            aux = float(valor)
+            if aux <= 0:
+                print("valor inválido para saque")
+            elif self.saldo <= aux:
+                print("falta de saldo na conta")
+            elif aux > self.limite_valor_saque:
+                print(f"limite do valor para saque ultrapassa o limite diario de R${self.limite_valor_saque:.2f}")
+            elif self.saques >= self.limite_quantidade_saque:
+                print(f"limite de saques diarios atigido: {self.limite_quantidade_saque}")
+            else:
+                self.saldo -= aux
+                self.extrato += f'R$ {aux:.2f} S\n'
+                self.saques += 1
+        else:
+            print("digite um valor adequado para saque: ")
+
+class Cliente:
+    def __init__(self, nome, cpf):
+        self.nome = nome
+        self.cpf = cpf
+
+class ContaCorrente(ContaBancaria):
+    def __init__(self, cliente):
+        super().__init__()
+        self.cliente = cliente
+
+class ContaPoupanca(ContaBancaria):
+    def __init__(self, cliente):
+        super().__init__()
+        self.cliente = cliente
+
+def cadastrar_cliente():
+    nome = input("Digite o nome do cliente: ")
+    cpf = input("Digite o CPF do cliente: ")
+    return Cliente(nome, cpf)
+
+def cadastrar_conta():
+    cliente = cadastrar_cliente()
+    tipo_conta = input("Digite o tipo de conta (C para Conta Corrente, P para Conta Poupança): ")
+    if tipo_conta.upper() == "C":
+        return ContaCorrente(cliente)
+    elif tipo_conta.upper() == "P":
+        return ContaPoupanca(cliente)
+    else:
+        print("Tipo de conta inválido")
+        return None
+
+menu = '''  
+[1] Depositar  
+[2] Sacar  
+[3] Extrato 
+[4] Cadastrar Conta 
+[5] Minha Conta
+[0] Sair  
+=> '''
+conta = None
+
+while True:
+    opcao = input(menu)
+    if opcao == '1':
+        conta.depositar()
+    elif opcao == '2':
+        conta.sacar()
+    elif opcao == '3':
+        print(conta)
+    elif opcao == '4':
+        conta = cadastrar_conta()
+        print(f"Seja bem-vindo(a), {conta.cliente.nome}!")
+    elif opcao == '5':
+        if conta is None:
+            print("Nenhuma conta cadastrada")
+        else:
+            print(conta.cliente.nome, conta)
+    elif opcao == '0':
+        break
+    else:
+        print('opcao invalida, tente novamente')
